@@ -1,0 +1,8 @@
+{% extends "boards/base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<div class="auth-layout"><aside class="auth-aside"><div class="auth-spark" aria-hidden="true">↗</div><p class="eyebrow">PICK UP WHERE YOU LEFT OFF</p><h1>Your team’s<br><span class="text-accent">next step awaits.</span></h1><p>Sign in to see what’s moving and where your team needs you.</p></aside>
+<section class="card form-card auth-card"><p class="eyebrow">WELCOME BACK</p><h2>Log in to Workroom</h2><p class="muted">Your project boards are ready.</p><form method="post" novalidate>{% csrf_token %}
+{% for field in form %}<div class="field-group"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>{% endfor %}
+{% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}{% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}<button class="button button-primary button-full" type="submit">Log in <span aria-hidden="true">→</span></button></form><p class="form-switch">New to Workroom? <a href="{% url 'register' %}">Create an account</a></p></section></div>
+{% endblock %}

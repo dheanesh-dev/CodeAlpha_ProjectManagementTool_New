@@ -1,0 +1,8 @@
+{% extends "boards/base.html" %}
+{% block title %}Create account{% endblock %}
+{% block content %}
+<div class="auth-layout"><aside class="auth-aside"><div class="auth-spark" aria-hidden="true">✳</div><p class="eyebrow">MAKE SPACE FOR GOOD WORK</p><h1>Better work<br><span class="text-accent">happens together.</span></h1><p>Bring a team around an idea and move it forward, one clear task at a time.</p></aside>
+<section class="card form-card auth-card"><p class="eyebrow">JOIN WORKROOM</p><h2>Create your account</h2><p class="muted">Set up your workspace profile.</p><form method="post" novalidate>{% csrf_token %}
+{% for field in form %}<div class="field-group"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<div class="field-hint">{{ field.help_text|safe }}</div>{% endif %}{% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>{% endfor %}
+{% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}<button class="button button-primary button-full" type="submit">Create account <span aria-hidden="true">→</span></button></form><p class="form-switch">Already have an account? <a href="{% url 'login' %}">Log in</a></p></section></div>
+{% endblock %}

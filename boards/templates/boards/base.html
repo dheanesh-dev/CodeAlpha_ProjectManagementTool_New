@@ -1,0 +1,15 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f4f6fa"><title>{% block title %}Workroom{% endblock %} · Workroom</title><link rel="stylesheet" href="{% static 'css/site.css' %}"></head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="site-header"><div class="header-inner">
+  <a class="brand" href="{% url 'dashboard' %}"><span class="brand-mark" aria-hidden="true">W</span><span>workroom</span></a>
+  <nav class="main-nav" aria-label="Main navigation">{% if user.is_authenticated %}<a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">Overview</a>{% endif %}</nav>
+  <div class="header-actions">{% if user.is_authenticated %}<span class="user-chip"><span class="avatar avatar-small">{{ user.username|slice:":1"|upper }}</span><span>{{ user.username }}</span></span><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="button button-quiet button-small" type="submit">Log out</button></form>{% else %}<a class="button button-quiet button-small" href="{% url 'login' %}">Log in</a><a class="button button-primary button-small" href="{% url 'register' %}">Create account</a>{% endif %}</div>
+</div></header>
+<main id="main-content" class="page-shell">{% if messages %}<div class="messages" aria-live="polite">{% for message in messages %}<div class="message message-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% block content %}{% endblock %}</main>
+<footer class="site-footer"><div class="footer-inner"><a class="brand brand-footer" href="{% url 'dashboard' %}"><span class="brand-mark" aria-hidden="true">W</span><span>workroom</span></a><span>Make good work happen, together.</span></div></footer>
+<script src="{% static 'js/site.js' %}" defer></script>
+</body></html>

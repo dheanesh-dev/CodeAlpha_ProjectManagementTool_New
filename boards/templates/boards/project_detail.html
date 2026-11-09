@@ -1,0 +1,24 @@
+{% extends "boards/base.html" %}
+{% block title %}{{ project.name }}{% endblock %}
+{% block content %}
+<div class="board-heading">
+<div class="breadcrumbs"><a href="{% url 'dashboard' %}">Projects</a><span aria-hidden="true">/</span><span>{{ project.name }}</span></div>
+<div class="board-title-row"><div><p class="eyebrow">PROJECT BOARD</p><h1>{{ project.name }}</h1><p class="heading-copy">{{ project.description|default:"A shared space for the team's next steps." }}</p></div>
+{% if is_owner %}<form method="post" action="{% url 'project_delete' project.pk %}" data-confirm="Delete this project and all its tasks? This cannot be undone.">{% csrf_token %}<button class="button button-danger-quiet" type="submit">Delete project</button></form>{% endif %}</div></div>
+<div class="board-summary">
+<div class="summary-item"><span class="summary-icon summary-purple" aria-hidden="true">▦</span><span><strong>{{ tasks_total }}</strong><small>Tasks</small></span></div>
+<div class="summary-item"><span class="summary-icon summary-green" aria-hidden="true">✓</span><span><strong>{{ done_total }}</strong><small>Completed</small></span></div>
+<div class="summary-team"><span class="summary-label">TEAM</span><div class="avatar-stack">{% for member in members|slice:":6" %}<span class="avatar avatar-tiny" title="{{ member.username }}">{{ member.username|slice:":1"|upper }}</span>{% endfor %}</div><span class="team-count">{{ members.count }} member{{ members.count|pluralize }}</span></div>
+{% if is_owner %}<details class="invite-popover"><summary class="button button-outline button-small">＋ Add member</summary><form method="post" action="{% url 'add_member' project.pk %}" class="invite-form">{% csrf_token %}<label for="{{ member_form.username.id_for_label }}">Username</label>{{ member_form.username }}<button class="button button-primary button-small" type="submit">Add to project</button></form></details>{% endif %}
+</div>
+<details class="card create-task-panel"><summary><span class="summary-plus" aria-hidden="true">＋</span><span><strong>Add a task</strong><small>Create and assign a new card</small></span><span class="summary-chevron" aria-hidden="true">⌄</span></summary>
+<form method="post" action="{% url 'task_create' project.pk %}" class="task-create-form" novalidate>{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><div class="form-grid form-grid-two">
+{% for field in task_form %}<div class="field-group {% if field.name == 'description' %}field-span{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>{% endfor %}
+</div><div class="form-actions"><button class="button button-primary" type="submit">Add task to board</button></div></form></details>
+<section class="kanban-board" aria-label="Task board">
+{% for lane in lanes %}<div class="kanban-lane {{ lane.class_name }}"><div class="lane-header"><div><span class="lane-dot" aria-hidden="true"></span><h2>{{ lane.label }}</h2></div><span class="lane-count">{{ lane.tasks|length }}</span></div><div class="lane-cards">
+{% for task in lane.tasks %}<article class="task-card"><div class="task-card-meta"><span class="priority priority-{{ task.priority }}">{{ task.get_priority_display }}</span>{% if task.due_date %}<span class="due-date">{{ task.due_date|date:"M j" }}</span>{% endif %}</div><h3><a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a></h3>{% if task.description %}<p class="task-card-description">{{ task.description|truncatechars:105 }}</p>{% endif %}<div class="task-card-footer"><span class="assignee-chip">{% if task.assignee %}<span class="avatar avatar-tiny">{{ task.assignee.username|slice:":1"|upper }}</span>{{ task.assignee.username }}{% else %}<span class="unassigned-dot"></span>Unassigned{% endif %}</span><a class="comment-count" href="{% url 'task_detail' task.pk %}" aria-label="View {{ task.comments_total }} comments">☷ {{ task.comments_total }}</a></div></article>
+{% empty %}<div class="lane-empty">No tasks here yet.</div>{% endfor %}
+</div></div>{% endfor %}
+</section>
+{% endblock %}
